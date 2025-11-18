@@ -1,0 +1,32 @@
+#preload all aliases
+#set -a to automatically export all functions
+set -a
+
+#HiCAssembler
+bwa() { singularity exec ${SINGULARITYdir}HiCAssembler.simg bwa "$@" ; }
+
+#SALSA
+SALSA() { singularity exec ${SINGULARITYdir}SALSA.simg python /install/SALSA/run_pipeline.py  "$@" ; }
+filter_bam() { singularity exec ${SINGULARITYdir}SALSA.simg perl /install/mapping_pipeline/filter_five_end.pl  "$@" ;  }
+combine_bam() { singularity exec ${SINGULARITYdir}SALSA.simg perl /install/mapping_pipeline/two_read_bam_combiner.pl "$@" ;  }
+AddOrReplaceReadGroups() { singularity exec ${SINGULARITYdir}SALSA.simg java -Xmx4G -Dpicard.useLegacyParser=false -Djava.io.tmpdir=$locTMP -jar /usr/local/bin/picard.jar AddOrReplaceReadGroups "$@" ; }
+MarkDuplicates() { singularity exec ${SINGULARITYdir}SALSA.simg java -Xmx60G -Dpicard.useLegacyParser=false -XX:-UseGCOverheadLimit -Djava.io.tmpdir=temp/ -jar /usr/local/bin/picard.jar  MarkDuplicates "$@" ; }
+getStats() { singularity exec ${SINGULARITYdir}SALSA.simg perl /install/mapping_pipeline/get_stats.pl "$@" ; }
+convert_to_hic() { singularity exec ${SINGULARITYdir}SALSA.simg /install/SALSA/convert.sh "$@" ; }
+
+#basicTools
+parallel() { singularity exec ${SINGULARITYdir}basicTools.simg parallel "$@" ; }
+mawk() { singularity exec ${SINGULARITYdir}basicTools.simg mawk "$@" ; }
+seqkit() { singularity exec ${SINGULARITYdir}basicTools.simg seqkit "$@" ; }
+samtools() { singularity exec ${SINGULARITYdir}basicTools.simg samtools "$@" ; }
+bedtools() { singularity exec ${SINGULARITYdir}basicTools.simg bedtools "$@" ; }
+faToTwoBit() { singularity exec  ${SINGULARITYdir}basicTools.simg faToTwoBit "$@"; }
+twoBitInfo() { singularity exec  ${SINGULARITYdir}basicTools.simg twoBitInfo "$@"; }
+
+#minimap2
+minimap2() { singularity exec ${SINGULARITYdir}minimap2.simg minimap2 "$@" ; }
+
+#ragtag
+agpcheck() { singularity exec ${SINGULARITYdir}ragtag.simg ragtag_agpcheck.py "$@" ; }
+agp2fasta() { singularity exec ${SINGULARITYdir}ragtag.simg ragtag_agp2fa.py "$@" ; }
+set +a
